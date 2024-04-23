@@ -1,7 +1,7 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class PlayerKeys implements KeyListener{
+public class PlayerKeys implements KeyListener {
 
     private Player player;
     private int keyUp;
@@ -11,23 +11,22 @@ public class PlayerKeys implements KeyListener{
     private int keyShoot;
     private boolean spacePressed = false;
 
-
-    public PlayerKeys(Player player, String side){
+    public PlayerKeys(Player player, String side) {
         super();
         this.player = player;
         switch (side) {
-            case "left" :
-                keyUp =  KeyEvent.VK_W;
-                keyDown =  KeyEvent.VK_S;
-                keyLeft =  KeyEvent.VK_A;
-                keyRight =  KeyEvent.VK_D;
+            case "left":
+                keyUp = KeyEvent.VK_W;
+                keyDown = KeyEvent.VK_S;
+                keyLeft = KeyEvent.VK_A;
+                keyRight = KeyEvent.VK_D;
                 keyShoot = KeyEvent.VK_U;
                 break;
-            case "right" :
-                keyUp =  KeyEvent.VK_UP;
-                keyDown =  KeyEvent.VK_DOWN;
-                keyLeft =  KeyEvent.VK_LEFT;
-                keyRight =  KeyEvent.VK_RIGHT;
+            case "right":
+                keyUp = KeyEvent.VK_UP;
+                keyDown = KeyEvent.VK_DOWN;
+                keyLeft = KeyEvent.VK_LEFT;
+                keyRight = KeyEvent.VK_RIGHT;
                 keyShoot = KeyEvent.VK_M;
                 break;
             default:
@@ -35,66 +34,70 @@ public class PlayerKeys implements KeyListener{
         }
     }
 
-
     public void keyTyped(KeyEvent e) {
-        
+
     }
+
     public void keyReleased(KeyEvent e) {
         int keyCode = e.getKeyCode();
         if (keyCode == KeyEvent.VK_SPACE) {
             spacePressed = false;
         }
-    }		
+    }
+
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
         if (keyCode == KeyEvent.VK_SPACE) {
             spacePressed = true;
         }
 
-        if(e.getKeyCode()== keyShoot)
-        {
+        if (e.getKeyCode() == keyShoot) {
             player.shoot();
         }
-        if(e.getKeyCode()== keyUp)
-        {
-            player.setFacingPosition("up");	
-
-            
-            if(!(player.getPlayerX() < 0))
-                player.modifyPlayerY(-2);
-
+        if (e.getKeyCode() == keyUp && canMoveUp()) {
+            player.setFacingPosition("up");
+            player.modifyPlayerY(-2);
         }
-        if(e.getKeyCode()== keyLeft)
-        {
+        if (e.getKeyCode() == keyLeft && canMoveLeft()) {
             player.setFacingPosition("left");
-            System.out.println(player.getFacingPosition());
-            
-            if(!(player.getPlayerX() < 2))
-                player.modifyPlayerX(-2);
+            player.modifyPlayerX(-2);
         }
-        if(e.getKeyCode()== keyDown)
-        {
+        if (e.getKeyCode() == keyDown && canMoveDown()) {
             player.setFacingPosition("down");
-            System.out.println(player.getFacingPosition());
-            
-            if(!(player.getPlayerY() > 540))
-                player.modifyPlayerY(2);
+            player.modifyPlayerY(2);
         }
-        if(e.getKeyCode()== keyRight)
-        {
+        if (e.getKeyCode() == keyRight && canMoveRight()) {
             player.setFacingPosition("right");
-            System.out.println(player.getFacingPosition());
-            
-            if(!(player.getPlayerX() > 600))
-                player.modifyPlayerX(2);
+            player.modifyPlayerX(2);
         }
-        
     }
 
     public boolean isSpacePressed() {
         return spacePressed;
     }
 
+    private boolean canMoveUp() {
+        int x = player.getPlayerX() / 50;
+        int y = (player.getPlayerY() - 2) / 50;
+        System.out.println(player.canMove(x, y));
+        return y >= 0 && player.getPlayerY() >= 2 && player.canMove(x, y);
+    }
 
+    private boolean canMoveDown() {
+        int x = player.getPlayerX() / 50;
+        int y = (player.getPlayerY() + 48) / 50;
+        return y < 12 && player.getPlayerY() <= 548 && player.canMove(x, y);
+    }
 
+    private boolean canMoveLeft() {
+        int x = (player.getPlayerX() - 2) / 50;
+        int y = player.getPlayerY() / 50;
+        return x >= 0 && player.getPlayerX() >= 2 && player.canMove(x, y);
+    }
+
+    private boolean canMoveRight() {
+        int x = (player.getPlayerX() + 48) / 50;
+        int y = player.getPlayerY() / 50;
+        return x < 13 && player.getPlayerX() <= 598 && player.canMove(x, y);
+    }
 }

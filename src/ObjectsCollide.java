@@ -28,7 +28,7 @@ public class ObjectsCollide {
             BufferedImage barricadeMetalImage = ImageIO.read(new File("barricadeMetal.png"));
             int iconIndex = 0;
             for (int y = 0; y < 200; y += 50) {
-                for (int x = 0; x < 200; x += 50) {
+                for (int x = 0; x < 500; x += 50) {
                     if (iconIndex < brickIcons.length) {
                         BufferedImage iconImage = assetsbgImage.getSubimage(x, y, 50, 50);
                         brickIcons[iconIndex++] = new ImageIcon(iconImage);
@@ -75,6 +75,20 @@ public class ObjectsCollide {
         return false;
     }
 
+	public boolean confirmCollision(int x, int y) {
+		// Calculate the row and column indices from x and y positions
+		int row = y / 50;
+		int col = x / 50;
+		// Check if the brick at the calculated indices is breakable
+		if (assetsMatrix[row][col] == 41) {
+			System.out.println("Collision confirmed at row " + row + ", col " + col);
+			// Perform actions for confirming collision with a breakable brick
+			assetsMatrix[row][col] = 0; // Remove the breakable brick
+			return true; // Collision confirmed
+		}
+		return false; // No collision with a breakable brick
+	}
+
     // Check for collision with solid bricks
     public boolean checkSolidCollision(int x, int y) {
         // Calculate the row and column indices from x and y positions
@@ -85,19 +99,28 @@ public class ObjectsCollide {
     }
 
     // Define the matrix to represent the brick layout
-    private int[][] assetsMatrix = {
+    private static int[][] assetsMatrix = {
         {0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0}
+        {0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 14, 0, 42, 0, 13, 0, 0, 0, 0},
+        {0, 0, 0, 0, 1, 41, 0, 42, 1, 0, 0, 0, 0},
+        {0, 0, 0, 0, 1, 41, 0, 42, 1, 0, 0, 0, 0},
+        {0, 0, 0, 0, 1, 41, 0, 42, 1, 0, 0, 0, 0}
     };
+
+	
+	public static int getAssetsMatrix(int x, int y) {
+		if (x >= 0 && x < assetsMatrix.length && y >= 0 && y < assetsMatrix[0].length) {
+			return assetsMatrix[y][x]; // Access the array with the corrected indices
+		} else {
+			return 0; // Return 0 for out-of-bounds coordinates
+		}
+	}
 
 }

@@ -69,6 +69,25 @@ public class Gameplay  extends JPanel implements ActionListener
 			ImageIcon playerPainter2 = player2.getPlayer();
 			playerPainter2.paintIcon(this, g, player2.getPlayerX(), player2.getPlayerY());
 			
+			//Collition Tank with objects 42 and 41
+			 // Handle collision detection for player 1 with breakable and solid bricks
+			 if (ObjectsCollide.getAssetsMatrix(player1.getPlayerX(), player1.getPlayerY()) == 41) {
+				System.out.println(ObjectsCollide.getAssetsMatrix(player1.getPlayerX(), player1.getPlayerY()));
+				if (br.confirmCollision(player1.getPlayerX(), player1.getPlayerY())) {
+					player1.modifyPlayerX(0); // Reset player position if colliding with breakable bricks
+					player1.removeLive(1); // Remove a life if colliding with breakable bricks
+				}
+			}
+	
+	
+			// Handle collision detection for player 2 with breakable and solid bricks
+			if (br.checkCollision(player2.getPlayerX(), player2.getPlayerY())) {
+				player2.modifyPlayerX(0); // Reset player position if colliding with breakable bricks
+				player2.removeLive(1); // Remove a life if colliding with breakable bricks
+			}
+	
+
+			//Collition Bullet
 			if(player1.getBullet() != null && player1.playerShot())
 			{
 				if(player1.getBulletShootDir().equals(""))

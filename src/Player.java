@@ -57,19 +57,19 @@ public class Player extends ImageIcon{
     public void setPlayer() {
         if(up){
             this.player = new ImageIcon("player"+playerColor+"_tank_up.png");	
-        System.out.println("Player is set facing UP"+"\n"+"Color: "+playerColor);                
+        // System.out.println("Player is set facing UP"+"\n"+"Color: "+playerColor);                
         }
         else if(down){
             this.player = new ImageIcon("player"+playerColor+"_tank_down.png");	
-        System.out.println("Player is set facing DOWN"+"\n"+"Color: "+playerColor);          
+        // System.out.println("Player is set facing DOWN"+"\n"+"Color: "+playerColor);          
         }
         else if(right){
             this.player = new ImageIcon("player"+playerColor+"_tank_right.png");	
-                System.out.println("Player is set facing RIGHT"+"\n"+"Color: "+playerColor);
+                // System.out.println("Player is set facing RIGHT"+"\n"+"Color: "+playerColor);
         }
         else if(left){
             this.player = new ImageIcon("player"+playerColor+"_tank_left.png");	
-                System.out.println("Player is set facing LEFT"+"\n"+"Color: "+playerColor);
+                // System.out.println("Player is set facing LEFT"+"\n"+"Color: "+playerColor);
         }
 
     }
@@ -274,6 +274,12 @@ public class Player extends ImageIcon{
 
     public String getName() {
         return this.name;
+    }
+
+    public boolean canMove(int x, int y) {
+        
+        return ObjectsCollide.getAssetsMatrix(x,y) != 42;
+
     }
 
 }
