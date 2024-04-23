@@ -20,10 +20,12 @@ public class Player extends ImageIcon{
     private boolean playerShot = false;
     private String bulletShootDir = "";
     private int initialX;
+    private String name;
     private int initialY;
     private static boolean firstRun = true;
 
-    public Player(int playerX, int playerY, String playerColor, int playerLives) {
+    public Player(int playerX, int playerY, String playerColor, int playerLives, String name) {
+        this.name = name;
         this.playerX = playerX;
         this.playerY = playerY;
         this.initialX = playerX;
@@ -268,6 +270,10 @@ public class Player extends ImageIcon{
 
     public void delBullet() {
         pb = null;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
 }

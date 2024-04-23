@@ -1,11 +1,6 @@
-import java.util.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import java.awt.*;
-
-import javax.swing.*;
 import javax.swing.Timer;
 
 
@@ -13,13 +8,13 @@ public class Gameplay  extends JPanel implements ActionListener
 {
 	private ObjectsCollide br;
 
-	private Player player1 = new Player(200, 550, "green", 5);
-	private Player player2 = new Player(400, 550, "orange", 5);
+	private Player player1 = new Player(200, 550, "green", 5, "Tekileo");
+	private Player player2 = new Player(400, 550, "orange", 5, "Naranjito");
 	
 	private Timer timer;
 	private int delay=2;
 	
-	private Player1Listener player1Listener;
+	private PlayerKeys pk1;
 	private PlayerKeys pk2;
 	
 	
@@ -28,11 +23,10 @@ public class Gameplay  extends JPanel implements ActionListener
 	public Gameplay()
 	{				
 		br = new ObjectsCollide();
-		player1Listener = new Player1Listener();
+		pk1 = new PlayerKeys(player1, "left");
 		pk2 = new PlayerKeys(player2, "right");
 		setFocusable(true);
-		//addKeyListener(this);
-		addKeyListener(player1Listener);
+		addKeyListener(pk1);
 		addKeyListener(pk2);
 		setFocusTraversalKeysEnabled(false);
         timer=new Timer(delay,this);
@@ -49,10 +43,7 @@ public class Gameplay  extends JPanel implements ActionListener
 		g.setColor(Color.DARK_GRAY);
 		g.fillRect(660, 0, 180, 600);
 		
-		// draw solid bricks
-		br.drawSolids(this, g);
-		
-		// draw Breakable bricks	
+		// draw screen assets
 		br.draw(this, g);
 
 		//Set initial config of the players
@@ -61,11 +52,11 @@ public class Gameplay  extends JPanel implements ActionListener
 		{
 			// draw player and placing the facing of the player
 			
-			player1.setInitialPosition("down");
+			player1.setInitialPosition("up");
 			player1.setPlayer();
 			player1.setBulletGraphic(g);
 		
-			//!TODO: See how can I optimize this code and get it to work properly
+			//!TODO: See how can I refactor this code and get it to work properly
 			ImageIcon playerPainter1 = player1.getPlayer();
 			playerPainter1.paintIcon(this, g, player1.getPlayerX(), player1.getPlayerY());
 			// player1.paintIcon(this, g, player1.getPlayerX(), player1.getPlayerY());
@@ -179,7 +170,7 @@ public class Gameplay  extends JPanel implements ActionListener
 			g.setColor(Color.white);
 			g.setFont(new Font("HELVETICA",Font.BOLD, 60));
 			g.drawString("Game Over", 200,300);
-			g.drawString("Player 2 Won", 180,380);
+			g.drawString(player2.getName()+" Won", 180,380);
 			play = false;
 			g.setColor(Color.white);
 			g.setFont(new Font("HELVETICA",Font.BOLD, 30));
@@ -190,30 +181,16 @@ public class Gameplay  extends JPanel implements ActionListener
 			g.setColor(Color.white);
 			g.setFont(new Font("HELVETICA",Font.BOLD, 60));
 			g.drawString("Game Over", 200,300);
-			g.drawString("Player 1 Won", 180,380);
+			g.drawString(player1.getName()+" Won", 180,380);
 			g.setColor(Color.white);
 			g.setFont(new Font("HELVETICA",Font.BOLD, 30));
 			g.drawString("(Space to Restart)", 230,430);
 			play = false;
 		}
-		
-		g.dispose();
-	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		timer.start();
-	
-		repaint();
-	}
-
-	private class Player1Listener implements KeyListener
-	{
-		public void keyTyped(KeyEvent e) {}
-		public void keyReleased(KeyEvent e) {}		
-		public void keyPressed(KeyEvent e) {	
-			if(e.getKeyCode()== KeyEvent.VK_SPACE && (player1.getLives() == 0 || player2.getLives() == 0))
-			{
+		if(player1.getLives() == 0 || player2.getLives() == 0){
+			if(pk1.isSpacePressed() || pk2.isSpacePressed()) {
+				// Reset game state
 				br = new ObjectsCollide();
 				player1.resetPlayerPosition();
 				player1.setFacingPosition("up");
@@ -228,48 +205,19 @@ public class Gameplay  extends JPanel implements ActionListener
 				play = true;
 				repaint();
 			}
-			if(e.getKeyCode()== KeyEvent.VK_U)
-			{
-				player1.shoot();
-				
-			}
-			if(e.getKeyCode()== KeyEvent.VK_W)
-			{
-				player1.setFacingPosition("up");		
-				
-				if(!(player1.getPlayerY() < 10))
-					player1.modifyPlayerY(-10);
-					System.out.println(player1.getFacingPosition());
-
-			}
-			if(e.getKeyCode()== KeyEvent.VK_A)
-			{
-				player1.setFacingPosition("left");
-				
-				if(!(player1.getPlayerX() < 10))
-					player1.modifyPlayerX(-10);
-
-					System.out.println(player1.getFacingPosition());
-			}
-			if(e.getKeyCode()== KeyEvent.VK_S)
-			{
-				player1.setFacingPosition("down");
-				System.out.println(player1.getFacingPosition());
-				
-				if(!(player1.getPlayerY() > 540))
-					player1.modifyPlayerY(10);
-			}
-			if(e.getKeyCode()== KeyEvent.VK_D)
-			{
-				player1.setFacingPosition("right");
-				System.out.println(player1.getFacingPosition());
-				
-				if(!(player1.getPlayerX() > 590))
-					player1.modifyPlayerX(10);
-			}
 		}
+		
+		
+		g.dispose();
 	}
 	
-	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		timer.start();
 		
+		repaint();
+	}
+
+	
+	
 }

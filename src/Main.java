@@ -17,7 +17,7 @@ public class Main {
 		menu.setVisible(false);
 		
 		obj.setBounds(10, 10, 800, 630);
-		obj.setTitle("Tank 2D");	
+		obj.setTitle("Tankist Fight");	
 		obj.setBackground(Color.gray);
 		obj.setResizable(false);
 		
