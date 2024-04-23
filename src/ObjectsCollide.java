@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -58,6 +59,8 @@ public class ObjectsCollide {
                 }else if (brickType > 0 && brickType < brickIcons.length) {
                     brickIcons[brickType].paintIcon(c, g, x, y);
                 }
+                // g.setColor(Color.RED);
+                // g.drawRect(x, y, 50, 50); 
             }
         }
     }
@@ -75,19 +78,38 @@ public class ObjectsCollide {
         return false;
     }
 
-	public boolean confirmCollision(int x, int y) {
-		// Calculate the row and column indices from x and y positions
-		int row = y / 50;
-		int col = x / 50;
-		// Check if the brick at the calculated indices is breakable
-		if (assetsMatrix[row][col] == 41) {
-			System.out.println("Collision confirmed at row " + row + ", col " + col);
-			// Perform actions for confirming collision with a breakable brick
-			assetsMatrix[row][col] = 0; // Remove the breakable brick
-			return true; // Collision confirmed
-		}
-		return false; // No collision with a breakable brick
-	}
+    // Confirm collision with breakable bricks and remove them
+    public boolean tankCollision(int x, int y) {
+        // Calculate the row and column indices from x and y positions
+        int row = y / 50;
+        int col = x / 50;
+        // Check if the brick at the calculated indices is breakable
+        if (assetsMatrix[row][col] == 41) {
+            // Define the reduced width and height for collision with element 41
+            int reducedWidth = 30;
+            int reducedHeight = 30;
+            
+            // Calculate the center position of the brick
+            int brickCenterX = col * 50 + 25;
+            int brickCenterY = row * 50 + 25;
+            
+            // Calculate the top-left corner of the reduced collision box
+            int topLeftX = brickCenterX - reducedWidth / 2;
+            int topLeftY = brickCenterY - reducedHeight / 2;
+            
+            // Check if the tank's center is within the reduced collision box
+            int tankCenterX = x + 30; // Assuming the tank image size is 30x30
+            int tankCenterY = y + 30;
+            
+            boolean withinXRange = tankCenterX >= topLeftX && tankCenterX <= topLeftX + reducedWidth;
+            boolean withinYRange = tankCenterY >= topLeftY && tankCenterY <= topLeftY + reducedHeight;
+            
+            assetsMatrix[row][col] = 0;
+            return withinXRange && withinYRange;
+        }
+        return false;
+    }
+    
 
     // Check for collision with solid bricks
     public boolean checkSolidCollision(int x, int y) {
@@ -114,13 +136,12 @@ public class ObjectsCollide {
         {0, 0, 0, 0, 1, 41, 0, 42, 1, 0, 0, 0, 0}
     };
 
-	
-	public static int getAssetsMatrix(int x, int y) {
-		if (x >= 0 && x < assetsMatrix.length && y >= 0 && y < assetsMatrix[0].length) {
-			return assetsMatrix[y][x]; // Access the array with the corrected indices
-		} else {
-			return 0; // Return 0 for out-of-bounds coordinates
-		}
-	}
-
+    // Get the value from assetsMatrix with corrected indices
+    public static int getAssetsMatrix(int x, int y) {
+        if (x >= 0 && x < assetsMatrix.length && y >= 0 && y < assetsMatrix[0].length) {
+            return assetsMatrix[y][x]; // Access the array with the corrected indices
+        } else {
+            return 0; // Return 0 for out-of-bounds coordinates
+        }
+    }
 }

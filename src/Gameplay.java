@@ -63,6 +63,9 @@ public class Gameplay  extends JPanel implements ActionListener
 
 			// draw player 2
 			player2.setPlayer();
+			// g.setColor(Color.RED);
+			// int player1HitboxSize = 30;
+			// g.drawRect(player1.getPlayerX() + (50 - player1HitboxSize) / 2, player1.getPlayerY() + (50 - player1HitboxSize) / 2, player1HitboxSize, player1HitboxSize);
 			player2.setInitialPosition("up");
 			player2.setBulletGraphic(g);
 						
@@ -71,18 +74,15 @@ public class Gameplay  extends JPanel implements ActionListener
 			
 			//Collition Tank with objects 42 and 41
 			 // Handle collision detection for player 1 with breakable and solid bricks
-			 if (ObjectsCollide.getAssetsMatrix(player1.getPlayerX(), player1.getPlayerY()) == 41) {
-				System.out.println(ObjectsCollide.getAssetsMatrix(player1.getPlayerX(), player1.getPlayerY()));
-				if (br.confirmCollision(player1.getPlayerX(), player1.getPlayerY())) {
-					player1.modifyPlayerX(0); // Reset player position if colliding with breakable bricks
+			 if (br.tankCollision(player1.getPlayerX(), player1.getPlayerY())) {
+					// player1.modifyPlayerX(0); // Reset player position if colliding with breakable bricks
 					player1.removeLive(1); // Remove a life if colliding with breakable bricks
-				}
 			}
 	
 	
 			// Handle collision detection for player 2 with breakable and solid bricks
-			if (br.checkCollision(player2.getPlayerX(), player2.getPlayerY())) {
-				player2.modifyPlayerX(0); // Reset player position if colliding with breakable bricks
+			if (br.tankCollision(player2.getPlayerX(), player2.getPlayerY())) {
+				// player2.modifyPlayerX(0); // Reset player position if colliding with breakable bricks
 				player2.removeLive(1); // Remove a life if colliding with breakable bricks
 			}
 	
@@ -177,12 +177,12 @@ public class Gameplay  extends JPanel implements ActionListener
 		g.setColor(Color.white);
 		g.setFont(new Font("HELVETICA",Font.BOLD, 15));
 		g.drawString("Scores", 700,30);
-		g.drawString("Player 1:  "+player1.getScore(), 670,60);
-		g.drawString("Player 2:  "+player2.getScore(), 670,90);
+		g.drawString(player1.getName()+":  "+player1.getScore(), 670,60);
+		g.drawString(player2.getName()+":  "+player2.getScore(), 670,90);
 		
 		g.drawString("Lives", 700,150);
-		g.drawString("Player 1:  "+player1.getLives(), 670,180);
-		g.drawString("Player 2:  "+player2.getLives(), 670,210);
+		g.drawString(player1.getName()+":  "+player1.getLives(), 670,180);
+		g.drawString(player2.getName()+":  "+player2.getLives(), 670,210);
 		
 		if(player1.getLives() == 0)
 		{

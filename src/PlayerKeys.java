@@ -79,25 +79,25 @@ public class PlayerKeys implements KeyListener {
     private boolean canMoveUp() {
         int x = player.getPlayerX() / 50;
         int y = (player.getPlayerY() - 2) / 50;
-        System.out.println(player.canMove(x, y));
         return y >= 0 && player.getPlayerY() >= 2 && player.canMove(x, y);
     }
-
+    
     private boolean canMoveDown() {
         int x = player.getPlayerX() / 50;
-        int y = (player.getPlayerY() + 48) / 50;
+        int y = (player.getPlayerY() + 52) / 50;
         return y < 12 && player.getPlayerY() <= 548 && player.canMove(x, y);
     }
-
+    
     private boolean canMoveLeft() {
         int x = (player.getPlayerX() - 2) / 50;
         int y = player.getPlayerY() / 50;
         return x >= 0 && player.getPlayerX() >= 2 && player.canMove(x, y);
     }
-
+    
     private boolean canMoveRight() {
-        int x = (player.getPlayerX() + 48) / 50;
+        int x = (player.getPlayerX() + 52) / 50;
         int y = player.getPlayerY() / 50;
         return x < 13 && player.getPlayerX() <= 598 && player.canMove(x, y);
     }
+    
 }
