@@ -12,6 +12,11 @@ public class PlayerBullet {
 		this.y = y;
 	}
 	
+	public PlayerBullet() {
+		this.x = 0;
+		this.y = 0;
+	}
+
 	public void move(String face)
 	{
 		if(face.equals("right"))

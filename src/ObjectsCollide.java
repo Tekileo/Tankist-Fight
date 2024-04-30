@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -24,9 +23,12 @@ public class ObjectsCollide {
     // Load breakable and solid brick icons from the cropped assets
     private void loadBrickIcons() {
         try {
-            BufferedImage assetsbgImage = ImageIO.read(new File("assetsbg.png"));
-            BufferedImage barricadeWoodImage = ImageIO.read(new File("barricadeWood.png"));
-            BufferedImage barricadeMetalImage = ImageIO.read(new File("barricadeMetal.png"));
+              // Load assetsbg.png from the classpath
+        BufferedImage assetsbgImage = ImageIO.read(getClass().getResource("/assetsbg.png"));
+        // Load barricadeWood.png from the classpath
+        BufferedImage barricadeWoodImage = ImageIO.read(getClass().getResource("/barricadeWood.png"));
+        // Load barricadeMetal.png from the classpath
+        BufferedImage barricadeMetalImage = ImageIO.read(getClass().getResource("/barricadeMetal.png"));
             int iconIndex = 0;
             for (int y = 0; y < 200; y += 50) {
                 for (int x = 0; x < 500; x += 50) {
@@ -51,6 +53,7 @@ public class ObjectsCollide {
                 int x = j * 50; // Calculate x-coordinate
                 int y = i * 50; // Calculate y-coordinate
                 int brickType = assetsMatrix[i][j];
+
                 brickIcons[0].paintIcon(c, g, x, y); // Use the first image from brickIcons for all tiles
                 if (brickType == 41) {
                     barricadeWoodIcon.paintIcon(c, g, x + 12, y + 12); // Draw barricadeWood centered in the tile
@@ -125,10 +128,10 @@ public class ObjectsCollide {
         {0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 41, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 41, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0},
+        {0, 0, 0, 0, 41, 0, 0, 0, 41, 0, 0, 0, 0},
         {0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 14, 0, 42, 0, 13, 0, 0, 0, 0},
         {0, 0, 0, 0, 1, 41, 0, 42, 1, 0, 0, 0, 0},

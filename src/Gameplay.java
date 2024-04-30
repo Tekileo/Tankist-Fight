@@ -11,20 +11,32 @@ public class Gameplay  extends JPanel implements ActionListener
 	private Player player1 = new Player(200, 550, "green", 5, "Tekileo");
 	private Player player2 = new Player(400, 550, "orange", 5, "Naranjito");
 	
+	
 	private Timer timer;
 	private int delay=2;
 	
 	private PlayerKeys pk1;
 	private PlayerKeys pk2;
 	
+	 private Thread playerKeysThread1;
+	 private Thread playerKeysThread2;
+	 //private Thread shotThread;
 	
 	private boolean play = true;
 	
 	public Gameplay()
-	{				
-		br = new ObjectsCollide();
+	{		
 		pk1 = new PlayerKeys(player1, "left");
 		pk2 = new PlayerKeys(player2, "right");
+		
+		  playerKeysThread1 = new Thread(pk1);
+	      playerKeysThread2 = new Thread(pk2);
+	      playerKeysThread1.start();
+	      playerKeysThread2.start();
+	      
+	      
+		br = new ObjectsCollide();
+		
 		setFocusable(true);
 		addKeyListener(pk1);
 		addKeyListener(pk2);

@@ -5,7 +5,7 @@ import javax.swing.ImageIcon;
 public class Player extends ImageIcon{
     private Graphics g;
     private ImageIcon player;
-    private PlayerBullet pb = null;
+    private PlayerBullet pb = new PlayerBullet();
     private int playerColor;
     private String playerColorString;
     private int playerX = 0;
@@ -261,11 +261,20 @@ public class Player extends ImageIcon{
     }
 
     public int getBulletX() {
-        return pb.getX();
+    	if (pb == null) {
+    		return 0;
+    	}else {
+    		return pb.getX();
+    	}
     }
 
     public int getBulletY() {
-        return pb.getY();
+    	if(pb == null) {
+    		return 0;
+    	}else {
+    		return pb.getY();
+    		
+    	}
     }
 
     public void delBullet() {
