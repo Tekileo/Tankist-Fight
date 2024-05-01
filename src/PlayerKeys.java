@@ -23,7 +23,7 @@ public class PlayerKeys implements KeyListener, Runnable {
                 keyDown = KeyEvent.VK_S;
                 keyLeft = KeyEvent.VK_A;
                 keyRight = KeyEvent.VK_D;
-                keyShoot = KeyEvent.VK_Q;
+                keyShoot = KeyEvent.VK_U;
                 break;
             case "right":
                 keyUp = KeyEvent.VK_UP;
