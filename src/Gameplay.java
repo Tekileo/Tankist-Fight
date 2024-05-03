@@ -5,6 +5,7 @@ import javax.swing.Timer;
 
 
 public class Gameplay  extends JPanel implements ActionListener 
+
 {
 	private ObjectsCollide br;
 
@@ -24,10 +25,13 @@ public class Gameplay  extends JPanel implements ActionListener
 	
 	private boolean play = true;
 	
-	public Gameplay()
+	public Gameplay(boolean online)
 	{		
-		pk1 = new PlayerKeys(player1, "left");
-		pk2 = new PlayerKeys(player2, "right");
+		if(online){
+			pk1 = new PlayerKeys(player1, "left");
+		
+		}else{
+			pk2 = new PlayerKeys(player2, "right");
 		
 		  playerKeysThread1 = new Thread(pk1);
 	      playerKeysThread2 = new Thread(pk2);
@@ -44,6 +48,8 @@ public class Gameplay  extends JPanel implements ActionListener
         timer=new Timer(delay,this);
 		timer.start();
 	}
+		}
+	
 	
 	public void paint(Graphics g)
 	{    		

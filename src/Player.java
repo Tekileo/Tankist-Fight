@@ -291,4 +291,11 @@ public class Player extends ImageIcon{
 
     }
 
+    public void resetMove() {
+        this.left = false;
+        this.right = false;
+        this.up = false;
+        this.down = false;
+    }
+
 }
