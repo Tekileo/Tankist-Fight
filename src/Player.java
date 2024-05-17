@@ -1,11 +1,14 @@
 import java.awt.Graphics;
 
 import javax.swing.ImageIcon;
+import java.io.Serializable;
 
-public class Player extends ImageIcon{
+public class Player implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Graphics g;
+    private int id;
     private ImageIcon player;
-    private PlayerBullet pb = new PlayerBullet();
+    private transient PlayerBullet pb = new PlayerBullet();
     private int playerColor;
     private String playerColorString;
     private int playerX = 0;
@@ -47,6 +50,21 @@ public class Player extends ImageIcon{
 
     public ImageIcon getPlayer() {
         return player;
+    }
+
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void resetPlayerPosition(){
