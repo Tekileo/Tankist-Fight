@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         JFrame gameFrame = new JFrame();
         Gameplay gamePlay;
         boolean online = true;
@@ -40,8 +40,7 @@ public class Main {
                   
                 players = (ArrayList<Player>) receivedObject;
                 System.out.println(players.size());
-                gamePlay = new Gameplay(online, players);
-                gamePlay.setCon(socket);
+                gamePlay = new Gameplay(online, players, socket);
                 gameFrame.setSize(800, 630);
                 gameFrame.setTitle("Tankist Fight");
                 gameFrame.setBackground(Color.gray);
@@ -57,7 +56,7 @@ public class Main {
                 // Handle exception properly, e.g., display an error message
             }
         }else{
-            gamePlay = new Gameplay(online, players);
+            gamePlay = new Gameplay(online, players, null);
                 gameFrame.setSize(800, 630);
                 gameFrame.setTitle("Tankist Fight");
                 gameFrame.setBackground(Color.gray);

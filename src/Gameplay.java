@@ -28,12 +28,11 @@ public class Gameplay extends JPanel implements ActionListener
 	private boolean play = true;
 	private Socket con;
 	
-	public void setCon(Socket con){
-		this.con = con;
-	}
 
-	public Gameplay(boolean online, ArrayList<Player> players) {
+
+	public Gameplay(boolean online, ArrayList<Player> players, Socket socket) throws Exception {
 		if (online) {
+			con = socket;
 			player1 = players.get(0);
 			player2 = players.get(1);
 			player1 = new Player(200, 550, "green", 5, "Tekileo");
@@ -45,27 +44,36 @@ public class Gameplay extends JPanel implements ActionListener
 			playerKeysThread1.start();
 			playerKeysThread2.start();
 
+			br = new ObjectsCollide();
+		
+			setFocusable(true);
+			addKeyListener(pko1);
+			addKeyListener(pko2);
+			setFocusTraversalKeysEnabled(false);
+			timer = new Timer(delay, this);
+			timer.start();
+
 		} else {
 			player1 = new Player(200, 550, "green", 5, "Tekileo");
 			player2 = new Player(400, 550, "orange", 5, "Naranjito");
-			pk1 = new PlayerKeys(player1, "left");
-			pk2 = new PlayerKeys(player2, "right");
+			pk1 = new PlayerKeys(player1, "left", false);
+			pk2 = new PlayerKeys(player2, "right", false);
 
 			playerKeysThread1 = new Thread(pk1);
 			playerKeysThread2 = new Thread(pk2);
 			playerKeysThread1.start();
 			playerKeysThread2.start();
-		}
 			br = new ObjectsCollide();
-
+		
 			setFocusable(true);
 			addKeyListener(pk1);
 			addKeyListener(pk2);
 			setFocusTraversalKeysEnabled(false);
 			timer = new Timer(delay, this);
 			timer.start();
+		}
 	}
-
+	
 	public void paint(Graphics g) {
 		// play background
 		g.setColor(Color.green);
