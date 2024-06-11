@@ -1,6 +1,14 @@
 import java.awt.Graphics;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
+
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
 public class Player implements Serializable {
@@ -245,6 +253,7 @@ public class Player implements Serializable {
         }
         firstRun = false; 
     }
+    
 
     public void shoot() {
         getFacingPosition();

@@ -1,11 +1,18 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.Socket;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class PlayerKeysOnline implements KeyListener, Runnable {
     private Player player;
@@ -143,9 +150,29 @@ public class PlayerKeysOnline implements KeyListener, Runnable {
 
         if (keyCode == keyShoot) {
             player.shoot();
+            playShootSound();
             sendPlayerKey("U");
         }
 
+    }
+
+     private void playShootSound() {
+        try {
+            // Load the audio file
+            File audioFile = new File("resources/shoot.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+
+            // Get a Clip object to play the audio
+            Clip clip = AudioSystem.getClip();
+
+            // Open the audio stream
+            clip.open(audioStream);
+
+            // Start playing the audio
+            clip.start();
+        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     // Implement the KeyListener interface methods

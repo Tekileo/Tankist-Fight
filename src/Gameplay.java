@@ -1,281 +1,345 @@
 import java.awt.event.*;
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
-
 import javax.swing.*;
 import java.awt.*;
 
-public class Gameplay extends JPanel implements ActionListener
+public class Gameplay extends JPanel implements ActionListener {
 
-{
-	private ObjectsCollide br = new ObjectsCollide();
-	private Player player1;
-	private Player player2;
+    private ObjectsCollide br = new ObjectsCollide();
+    private Player player1;
+    private Player player2;
 
-	private ArrayList<Player> players = new ArrayList<>();
-	private Timer timer;
-	private int delay = 2;
+    private ArrayList<Player> players = new ArrayList<>();
+    private Timer timer;
+    private int delay = 2;
+    private int timesSpace = 0;
 
-	private PlayerKeys pk1;
-	private PlayerKeys pk2;
-	private PlayerKeysOnline pko;
-	private HandlerResponse phr;
+    private static final String DB_URL = "jdbc:mysql://limines.duckdns.org:3306/tankist";
+    private static final String USER = "tankist";
+    private static final String PASSWORD = "TankistFight24";
 
-	private Thread playerKeysOnlineThread;
-	private Thread phrThread;
+    private PlayerKeys pk1;
+    private PlayerKeys pk2;
+    private PlayerKeysOnline pko;
+    private HandlerResponse phr;
 
-	private Thread playerKeysThread1;
-	private Thread playerKeysThread2;
-	// private Thread shotThread;
+    private Thread playerKeysOnlineThread;
+    private Thread phrThread;
 
-	private boolean play = true;
-	private Socket con;
-	private boolean online;
-	
+    private Thread playerKeysThread1;
+    private Thread playerKeysThread2;
 
+    private boolean play = true;
+    private Socket con;
+    private boolean online;
+    private boolean isHost;
+	private String name;
 
-	public Gameplay(boolean online, Socket con, boolean isHost) throws Exception {
-		this.online = online;
-		this.con = con;
-		if (online) {
-            player1 = new Player(200, 550, "green", 5, "Tekileo");
-            player2 = new Player(400, 550, "orange", 5, "Naranjito");
-			players.add(player1);
-			players.add(player2);
-			if (isHost) {
-				pko = new PlayerKeysOnline(player1 , con , "left");
-				phr = new HandlerResponse(player2, con, "Player2");
-				System.out.println("Im the green one");
-			}else{
-				pko = new PlayerKeysOnline(player2 , con, "left");
-				phr = new HandlerResponse(player1, con,"Player1");
-				System.out.println("Im the orange one");
-			}
-			
-			addKeyListener(pko);
-			
-			playerKeysOnlineThread = new Thread(pko);
-			phrThread = new Thread(phr);
+    public Gameplay(boolean online, Socket con, boolean isHost, String name) throws Exception {
+        this.online = online;
+        this.isHost = isHost;
+        this.con = con;
+		this.name = name;
+        if (online) {
+            player1 = new Player(200, 550, "green", 5, null);
+            player2 = new Player(400, 550, "orange", 5, null);
+            players.add(player1);
+            players.add(player2);
+            if (isHost) {
+				player1.setName(name);
+				player2.setName("Player 2");
+                pko = new PlayerKeysOnline(player1, con, "left");
+                phr = new HandlerResponse(player2, con, "Player2");
+                System.out.println("Im the green one");
+            } else {
+				player2.setName(name);
+				player1.setName("Player 1");
+                pko = new PlayerKeysOnline(player2, con, "left");
+                phr = new HandlerResponse(player1, con, "Player1");
+                System.out.println("Im the orange one");
+            }
 
-			playerKeysOnlineThread.start();
-			phrThread.start();
+            addKeyListener(pko);
 
-			br = new ObjectsCollide();
-			
+            playerKeysOnlineThread = new Thread(pko);
+            phrThread = new Thread(phr);
 
+            playerKeysOnlineThread.start();
+            phrThread.start();
 
-			// Make sure the JPanel or JFrame can receive focus
-			this.setFocusable(true);
-			this.requestFocusInWindow();
-			timer = new Timer(delay, this);
-			timer.start();
+            br = new ObjectsCollide();
+
+            // Make sure the JPanel or JFrame can receive focus
+            this.setFocusable(true);
+            this.requestFocusInWindow();
+            timer = new Timer(delay, this);
+            timer.start();
         } else {
-            player1 = new Player(200, 550, "green", 5, "Tekileo");
-			player2 = new Player(400, 550, "orange", 5, "Naranjito");
-			pk1 = new PlayerKeys(player1, "left");
-			pk2 = new PlayerKeys(player2, "left");
+            player1 = new Player(200, 550, "green", 5, "Player 1");
+            player2 = new Player(400, 550, "orange", 5, "Player 2");
+            pk1 = new PlayerKeys(player1, "left");
+            pk2 = new PlayerKeys(player2, "right");
 
-			playerKeysThread1 = new Thread(pk1);
-			playerKeysThread2 = new Thread(pk2);
-			playerKeysThread1.start();
-			playerKeysThread2.start();
-			br = new ObjectsCollide();
-		
-			setFocusable(true);
-			addKeyListener(pk1);
-			addKeyListener(pk2);
-			setFocusTraversalKeysEnabled(false);
-			timer = new Timer(delay, this);
-			timer.start();
-			}
+            playerKeysThread1 = new Thread(pk1);
+            playerKeysThread2 = new Thread(pk2);
+            playerKeysThread1.start();
+            playerKeysThread2.start();
+            br = new ObjectsCollide();
+
+            setFocusable(true);
+            addKeyListener(pk1);
+            addKeyListener(pk2);
+            setFocusTraversalKeysEnabled(false);
+            timer = new Timer(delay, this);
+            timer.start();
         }
-	
-	public void paint(Graphics g) {
-		// play background
-		g.setColor(Color.green);
-		g.fillRect(0, 0, 650, 600);
+    }
 
-		// right side background
-		g.setColor(Color.DARK_GRAY);
-		g.fillRect(660, 0, 180, 600);
+    public void paint(Graphics g) {
+        // play background
+        g.setColor(Color.green);
+        g.fillRect(0, 0, 650, 635);
 
-		// draw screen assets
-		br.draw(this, g);
+        // right side background
+        g.setColor(Color.DARK_GRAY);
+        g.fillRect(660, 0, 180, 635);
 
-		// Set initial config of the players
+        // draw screen assets
+        br.draw(this, g);
 
-		if (play) {
-			// draw player and placing the facing of the player
+        // Set initial config of the players
+        if (play) {
+            // draw player and placing the facing of the player
+            player1.setInitialPosition("up");
+            player1.setPlayer();
+            player1.setBulletGraphic(g);
 
-			player1.setInitialPosition("up");
-			player1.setPlayer();
-			player1.setBulletGraphic(g);
+            ImageIcon playerPainter1 = player1.getPlayer();
+            playerPainter1.paintIcon(this, g, player1.getPlayerX(), player1.getPlayerY());
 
-			// !TODO: See how can I refactor this code and get it to work properly
-			ImageIcon playerPainter1 = player1.getPlayer();
-			playerPainter1.paintIcon(this, g, player1.getPlayerX(), player1.getPlayerY());
-			// player1.paintIcon(this, g, player1.getPlayerX(), player1.getPlayerY());
+            // draw player 2
+            player2.setPlayer();
+            player2.setInitialPosition("up");
+            player2.setBulletGraphic(g);
 
-			// draw player 2
-			player2.setPlayer();
-			// g.setColor(Color.RED);
-			// int player1HitboxSize = 30;
-			// g.drawRect(player1.getPlayerX() + (50 - player1HitboxSize) / 2,
-			// player1.getPlayerY() + (50 - player1HitboxSize) / 2, player1HitboxSize,
-			// player1HitboxSize);
-			player2.setInitialPosition("up");
-			player2.setBulletGraphic(g);
+            ImageIcon playerPainter2 = player2.getPlayer();
+            playerPainter2.paintIcon(this, g, player2.getPlayerX(), player2.getPlayerY());
 
-			ImageIcon playerPainter2 = player2.getPlayer();
-			playerPainter2.paintIcon(this, g, player2.getPlayerX(), player2.getPlayerY());
+            // Collition Tank with objects 42 and 41
+            // Handle collision detection for player 1 with breakable and solid bricks
+            if (br.tankCollision(player1.getPlayerX(), player1.getPlayerY())) {
+                player1.removeLive(1); // Remove a life if colliding with breakable bricks
+            }
 
-			// Collition Tank with objects 42 and 41
-			// Handle collision detection for player 1 with breakable and solid bricks
-			if (br.tankCollision(player1.getPlayerX(), player1.getPlayerY())) {
-				// player1.modifyPlayerX(0); // Reset player position if colliding with
-				// breakable bricks
-				player1.removeLive(1); // Remove a life if colliding with breakable bricks
-			}
+            // Handle collision detection for player 2 with breakable and solid bricks
+            if (br.tankCollision(player2.getPlayerX(), player2.getPlayerY())) {
+                player2.removeLive(1); // Remove a life if colliding with breakable bricks
+            }
 
-			// Handle collision detection for player 2 with breakable and solid bricks
-			if (br.tankCollision(player2.getPlayerX(), player2.getPlayerY())) {
-				// player2.modifyPlayerX(0); // Reset player position if colliding with
-				// breakable bricks
-				player2.removeLive(1); // Remove a life if colliding with breakable bricks
-			}
+            // Collition Bullet
+            handleBulletCollision(g, player1, player2);
+            handleBulletCollision(g, player2, player1);
+        }
 
-			// Collition Bullet
-			if (player1.getBullet() != null && player1.playerShot()) {
-				if (player1.getBulletShootDir().equals("")) {
-					player1.setBulletShootDir();
-				} else {
-					player1.shoot();
-				}
+        // the scores
+        g.setColor(Color.white);
+        g.setFont(new Font("HELVETICA", Font.BOLD, 15));
+        g.drawString("Scores", 700, 30);
+        g.drawString(player1.getName() + ":  " + player1.getScore(), 670, 60);
+        g.drawString(player2.getName() + ":  " + player2.getScore(), 670, 90);
 
-				if (new Rectangle(player1.getBulletX(), player1.getBulletY(), 10, 10)
-						.intersects(new Rectangle(player2.getPlayerX(), player2.getPlayerY(), 50, 50))) {
-					player1.addScore(10);
-					player2.removeLive(1);
-					player1.delBullet();
-					player1.setPlayerShot(false);
-					player1.setBulletShootDir("");
-				}
+        g.drawString("Lives", 700, 150);
+        g.drawString(player1.getName() + ":  " + player1.getLives(), 670, 180);
+        g.drawString(player2.getName() + ":  " + player2.getLives(), 670, 210);
 
-				if (br.checkCollision(player1.getBulletX(), player1.getBulletY())
-						|| br.checkSolidCollision(player1.getBulletX(), player1.getBulletY())) {
-					player1.delBullet();
-					player1.setPlayerShot(false);
-					player1.setBulletShootDir("");
-				}
+        handleGameOver(g);
+        g.dispose();
+    }
 
-				if (player1.getBulletY() < 1
-						|| player1.getBulletY() > 580
-						|| player1.getBulletX() < 1
-						|| player1.getBulletX() > 630) {
-					player1.delBullet();
-					player1.setPlayerShot(false);
-					player1.setBulletShootDir("");
-				}
-			}
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        timer.start();
+        repaint();
+    }
 
-			if (player2.getBullet() != null && player2.playerShot()) {
-				if (player2.getBulletShootDir().equals("")) {
-					player2.setBulletShootDir();
-				} else {
-					player2.shoot();
-				}
+    public void setSocket(Socket socket) {
+        this.con = socket;
+    }
 
-				if (new Rectangle(player2.getBulletX(), player2.getBulletY(), 10, 10)
-						.intersects(new Rectangle(player1.getPlayerX(), player1.getPlayerY(), 50, 50))) {
-					player2.addScore(10);
-					player1.removeLive(1);
-					player2.delBullet();
-					player2.setPlayerShot(false);
-					player2.setBulletShootDir("");
-				}
+    private void handleBulletCollision(Graphics g, Player shooter, Player target) {
+        if (shooter.getBullet() != null && shooter.playerShot()) {
+            if (shooter.getBulletShootDir().equals("")) {
+                shooter.setBulletShootDir();
+            } else {
+                shooter.shoot();
+            }
 
-				if (br.checkCollision(player2.getBulletX(), player2.getBulletY())
-						|| br.checkSolidCollision(player2.getBulletX(), player2.getBulletY())) {
-					player2.delBullet();
-					player2.setPlayerShot(false);
-					player2.setBulletShootDir("");
-				}
+            if (new Rectangle(shooter.getBulletX(), shooter.getBulletY(), 10, 10)
+                    .intersects(new Rectangle(target.getPlayerX(), target.getPlayerY(), 50, 50))) {
+                shooter.addScore(10);
+                target.removeLive(1);
+                shooter.delBullet();
+                shooter.setPlayerShot(false);
+                shooter.setBulletShootDir("");
+            }
 
-				if (player2.getBulletY() < 1
-						|| player2.getBulletY() > 580
-						|| player2.getBulletX() < 1
-						|| player2.getBulletX() > 630) {
-					player2.delBullet();
-					player2.setPlayerShot(false);
-					player2.setBulletShootDir("");
-				}
-			}
+            if (br.checkCollision(shooter.getBulletX(), shooter.getBulletY())
+                    || br.checkSolidCollision(shooter.getBulletX(), shooter.getBulletY())) {
+                shooter.delBullet();
+                shooter.setPlayerShot(false);
+                shooter.setBulletShootDir("");
+            }
+
+            if (shooter.getBulletY() < 1 || shooter.getBulletY() > 580 || shooter.getBulletX() < 1 || shooter.getBulletX() > 630) {
+                shooter.delBullet();
+                shooter.setPlayerShot(false);
+                shooter.setBulletShootDir("");
+            }
+        }
+    }
+
+    private void handleGameOver(Graphics g) {
+        if (player1.getLives() == 0) {
+            drawGameOver(g, player2.getName());
+            play = false;
+        } else if (player2.getLives() == 0) {
+            drawGameOver(g, player1.getName());
+            play = false;
+        }
+
+        if (!online) {
+            if (player1.getLives() == 0 || player2.getLives() == 0) {
+                if (pk1.isSpacePressed() || pk2.isSpacePressed()) {
+                    resetGame();
+                }
+            }
+        } else {
+            if ((player1.getLives() == 0 || player2.getLives() == 0) && isHost) {
+                if (pko.isSpacePressed()) {
+                    timesSpace += 1;
+                    if (timesSpace == 1) {
+                        updateDatabase();
+                        restartApplication();
+                    }
+                }
+            }
+			if ((player1.getLives() == 0 || player2.getLives() == 0) && !isHost) {
+                if (pko.isSpacePressed()) {
+                    timesSpace += 1;
+                    if (timesSpace == 1) { 
+                        restartApplication();
+                    }
+                }
+            }
+        }
+    }
+
+    private void drawGameOver(Graphics g, String winnerName) {
+        g.setColor(Color.white);
+        g.setFont(new Font("HELVETICA", Font.BOLD, 60));
+        g.drawString("Game Over", 200, 300);
+        g.drawString(winnerName + " Won", 180, 380);
+        g.setFont(new Font("HELVETICA", Font.BOLD, 30));
+		if(online){
+			g.drawString("(Space to close)", 230, 430);
+		}else{
+			g.drawString("(Space to go back)", 230, 430);
+		
 		}
+    }
 
-		// the scores
-		g.setColor(Color.white);
-		g.setFont(new Font("HELVETICA", Font.BOLD, 15));
-		g.drawString("Scores", 700, 30);
-		g.drawString(player1.getName() + ":  " + player1.getScore(), 670, 60);
-		g.drawString(player2.getName() + ":  " + player2.getScore(), 670, 90);
+    private void resetGame() {
+        br = new ObjectsCollide();
+        player1.resetPlayerPosition();
+        player1.setFacingPosition("up");
 
-		g.drawString("Lives", 700, 150);
-		g.drawString(player1.getName() + ":  " + player1.getLives(), 670, 180);
-		g.drawString(player2.getName() + ":  " + player2.getLives(), 670, 210);
+        player2.resetPlayerPosition();
+        player2.setFacingPosition("up");
 
-		if (player1.getLives() == 0) {
-			g.setColor(Color.white);
-			g.setFont(new Font("HELVETICA", Font.BOLD, 60));
-			g.drawString("Game Over", 200, 300);
-			g.drawString(player2.getName() + " Won", 180, 380);
-			play = false;
-			g.setColor(Color.white);
-			g.setFont(new Font("HELVETICA", Font.BOLD, 30));
-			g.drawString("(Space to Restart)", 230, 430);
-		} else if (player2.getLives() == 0) {
-			g.setColor(Color.white);
-			g.setFont(new Font("HELVETICA", Font.BOLD, 60));
-			g.drawString("Game Over", 200, 300);
-			g.drawString(player1.getName() + " Won", 180, 380);
-			g.setColor(Color.white);
-			g.setFont(new Font("HELVETICA", Font.BOLD, 30));
-			g.drawString("(Space to Restart)", 230, 430);
-			play = false;
-		}
+        player1.setPlayerScore(0);
+        player1.setPlayerLives(5);
+        player2.setPlayerScore(0);
+        player2.setPlayerLives(5);
+        play = true;
+        repaint();
+    }
 
-		if (player1.getLives() == 0 || player2.getLives() == 0) {
-			if (pk1.isSpacePressed() || pk2.isSpacePressed()) {
-				// Reset game state
-				br = new ObjectsCollide();
-				player1.resetPlayerPosition();
-				player1.setFacingPosition("up");
+    private void updateDatabase() {
+        try {
+            // Calculate the total score for updating the database
+            int matchScore = player1.getScore() + player2.getScore();
 
-				player2.resetPlayerPosition();
-				player2.setFacingPosition("up");
+            // Establish database connection
+            Connection connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
 
-				player1.setPlayerScore(0);
-				player1.setPlayerLives(5);
-				player2.setPlayerScore(0);
-				player2.setPlayerLives(5);
-				play = true;
-				repaint();
-			}
-		}
+            // Update Player1's score in the database
+            updatePlayerScore(connection, player1.getName(), player1.getScore());
 
-		g.dispose();
-	}
+            // Update Player2's score in the database
+            updatePlayerScore(connection, player2.getName(), player2.getScore());
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		timer.start();
+            // Prepare the SQL statement to insert into PlayersTog
+            String sql = "INSERT INTO PlayersTog(Mapa, Player1, Player2, Score) VALUES (?, ?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(sql);
 
-		repaint();
-	}
+            // Set the values for the parameters in the prepared statement
+            statement.setInt(1, 1); // Mapa value
+            statement.setString(2, player1.getName()); // Player1 name
+            statement.setString(3, player2.getName()); // Player2 name
+            statement.setInt(4, matchScore); // Total match score
 
-	public void setSocket(Socket socket) {
-	this.con = socket;
-	}
+            // Execute the statement to insert the new entry into the database
+            statement.executeUpdate();
 
+            // Close the statement and connection
+            statement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updatePlayerScore(Connection connection, String playerName, int matchScore) throws SQLException {
+        // Prepare the SQL statement to update the player's score
+        String sql = "UPDATE Player SET Score = Score + ? WHERE Name = ?";
+        PreparedStatement statement = connection.prepareStatement(sql);
+
+        // Set the values for the parameters in the prepared statement
+        statement.setInt(1, matchScore); // Match score
+        statement.setString(2, playerName); // Player name
+
+        // Execute the statement to update the player's score in the database
+        statement.executeUpdate();
+
+        // Close the statement
+        statement.close();
+    }
+
+	private void restartApplication() {
+    try {
+        String javaBin = System.getProperty("java.home") + "/bin/java";
+        String jarPath = new File(Gameplay.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+        
+        ArrayList<String> command = new ArrayList<>();
+        command.add(javaBin);
+        command.add("-jar");
+        command.add(jarPath);
+
+        ProcessBuilder builder = new ProcessBuilder(command);
+        builder.start();
+        
+        System.exit(0);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 }

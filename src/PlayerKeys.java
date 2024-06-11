@@ -1,5 +1,13 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class PlayerKeys implements KeyListener, Runnable {
     private Player player;
@@ -71,11 +79,31 @@ public class PlayerKeys implements KeyListener, Runnable {
 
         if (keyCode == keyShoot) {
             player.shoot();
+            playShootSound();
         }
     }
 
     public boolean isSpacePressed() {
         return spacePressed;
+    }
+
+     private void playShootSound() {
+        try {
+            // Load the audio file
+            File audioFile = new File("resources/shoot.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+
+            // Get a Clip object to play the audio
+            Clip clip = AudioSystem.getClip();
+
+            // Open the audio stream
+            clip.open(audioStream);
+
+            // Start playing the audio
+            clip.start();
+        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
