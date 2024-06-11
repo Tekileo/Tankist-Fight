@@ -1,25 +1,30 @@
 import java.awt.event.*;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.swing.*;
 import java.awt.*;
-import javax.swing.Timer;
 
 public class Gameplay extends JPanel implements ActionListener
 
 {
-	private ObjectsCollide br;
+	private ObjectsCollide br = new ObjectsCollide();
 	private Player player1;
 	private Player player2;
 
+	private ArrayList<Player> players = new ArrayList<>();
 	private Timer timer;
 	private int delay = 2;
 
 	private PlayerKeys pk1;
 	private PlayerKeys pk2;
-	private PlayerKeysOnline pko1;
-	private PlayerKeysOnline pko2;
+	private PlayerKeysOnline pko;
+	private HandlerResponse phr;
+
+	private Thread playerKeysOnlineThread;
+	private Thread phrThread;
 
 	private Thread playerKeysThread1;
 	private Thread playerKeysThread2;
@@ -27,37 +32,50 @@ public class Gameplay extends JPanel implements ActionListener
 
 	private boolean play = true;
 	private Socket con;
+	private boolean online;
 	
 
 
-	public Gameplay(boolean online, ArrayList<Player> players, Socket socket) throws Exception {
+	public Gameplay(boolean online, Socket con, boolean isHost) throws Exception {
+		this.online = online;
+		this.con = con;
 		if (online) {
-			con = socket;
-			player1 = players.get(0);
-			player2 = players.get(1);
-			player1 = new Player(200, 550, "green", 5, "Tekileo");
-			player2 = new Player(400, 550, "orange", 5, "Naranjito");
-			pko1 = new PlayerKeysOnline(player1, con, true);
-			pko2 = new PlayerKeysOnline(player2, con, false);
-			playerKeysThread1 = new Thread(pko1);
-			playerKeysThread2 = new Thread(pko2);
-			playerKeysThread1.start();
-			playerKeysThread2.start();
+            player1 = new Player(200, 550, "green", 5, "Tekileo");
+            player2 = new Player(400, 550, "orange", 5, "Naranjito");
+			players.add(player1);
+			players.add(player2);
+			if (isHost) {
+				pko = new PlayerKeysOnline(player1 , con , "left");
+				phr = new HandlerResponse(player2, con, "Player2");
+				System.out.println("Im the green one");
+			}else{
+				pko = new PlayerKeysOnline(player2 , con, "left");
+				phr = new HandlerResponse(player1, con,"Player1");
+				System.out.println("Im the orange one");
+			}
+			
+			addKeyListener(pko);
+			
+			playerKeysOnlineThread = new Thread(pko);
+			phrThread = new Thread(phr);
+
+			playerKeysOnlineThread.start();
+			phrThread.start();
 
 			br = new ObjectsCollide();
-		
-			setFocusable(true);
-			addKeyListener(pko1);
-			addKeyListener(pko2);
-			setFocusTraversalKeysEnabled(false);
+			
+
+
+			// Make sure the JPanel or JFrame can receive focus
+			this.setFocusable(true);
+			this.requestFocusInWindow();
 			timer = new Timer(delay, this);
 			timer.start();
-
-		} else {
-			player1 = new Player(200, 550, "green", 5, "Tekileo");
+        } else {
+            player1 = new Player(200, 550, "green", 5, "Tekileo");
 			player2 = new Player(400, 550, "orange", 5, "Naranjito");
-			pk1 = new PlayerKeys(player1, "left", false);
-			pk2 = new PlayerKeys(player2, "right", false);
+			pk1 = new PlayerKeys(player1, "left");
+			pk2 = new PlayerKeys(player2, "left");
 
 			playerKeysThread1 = new Thread(pk1);
 			playerKeysThread2 = new Thread(pk2);
@@ -71,8 +89,8 @@ public class Gameplay extends JPanel implements ActionListener
 			setFocusTraversalKeysEnabled(false);
 			timer = new Timer(delay, this);
 			timer.start();
-		}
-	}
+			}
+        }
 	
 	public void paint(Graphics g) {
 		// play background

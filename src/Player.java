@@ -61,7 +61,10 @@ public class Player implements Serializable {
         this.id = id;
     }
 
-    
+    public void setPlayerPos(int x, int y){
+        this.playerX = x;
+        this.playerY = y;
+    }
 
     public void setName(String name) {
         this.name = name;

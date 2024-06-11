@@ -16,8 +16,7 @@ public class PlayerKeys implements KeyListener, Runnable {
     private boolean movingRight = false;
     private static final int MOVE_SPEED = 2;
 
-    public PlayerKeys(Player player, String side, boolean online) {
-        this.online = online;
+    public PlayerKeys(Player player, String side) {
         this.player = player;
         switch (side) {
             case "left":
