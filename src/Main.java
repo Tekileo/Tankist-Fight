@@ -16,6 +16,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -24,7 +30,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class Main {
-
+    
+    private static Clip backgroundMusicClip;
     private static boolean online = false;
     private static boolean isHost = false;
     private static String host = "localhost";
@@ -47,6 +54,7 @@ public class Main {
         BackgroundPanel panel = new BackgroundPanel();
         mainMenuFrame.add(panel);
         placeMainMenuComponents(panel);
+        playBackgroundMusic("resources/BgMain.wav", -10.0f);
 
         mainMenuFrame.setVisible(true);
     }
@@ -59,6 +67,36 @@ public class Main {
     private static Connection connect() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
+
+    private static void playBackgroundMusic(String filename, float volume) {
+    try {
+        File audioFile = new File(filename);
+        AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+
+        // Get a Clip object to play the audio
+        backgroundMusicClip = AudioSystem.getClip();
+
+        // Open the audio stream
+        backgroundMusicClip.open(audioStream);
+
+        // Get the FloatControl object associated with MASTER_GAIN
+        FloatControl gainControl = (FloatControl) backgroundMusicClip.getControl(FloatControl.Type.MASTER_GAIN);
+
+        // Set the volume level (in decibels)
+        gainControl.setValue(volume);
+
+        // Start playing the background music in a loop
+        backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
+    } catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {
+        ex.printStackTrace();
+    }
+}
+
+private static void stopBackgroundMusic() {
+    if (backgroundMusicClip != null && backgroundMusicClip.isRunning()) {
+        backgroundMusicClip.stop();
+    }
+}
 
     // Check if user exists in the database
     private static boolean checkIfUserExists(String username) {
@@ -286,7 +324,7 @@ public class Main {
         gameFrame.setResizable(false);
         gameFrame.setLocationRelativeTo(null);
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        stopBackgroundMusic();
         Gameplay gamePlay = new Gameplay(online, null, false, null);
         gameFrame.add(gamePlay);
         gameFrame.setVisible(true);
@@ -301,7 +339,7 @@ public class Main {
         gameFrame.setResizable(false);
         gameFrame.setLocationRelativeTo(null);
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        stopBackgroundMusic();
         Gameplay gamePlay = new Gameplay(online, socket, isHost, username);
         gameFrame.add(gamePlay);
         gameFrame.setVisible(true);

@@ -79,7 +79,6 @@ public class PlayerKeys implements KeyListener, Runnable {
 
         if (keyCode == keyShoot) {
             player.shoot();
-            playShootSound();
         }
     }
 
@@ -87,43 +86,26 @@ public class PlayerKeys implements KeyListener, Runnable {
         return spacePressed;
     }
 
-     private void playShootSound() {
-        try {
-            // Load the audio file
-            File audioFile = new File("resources/shoot.wav");
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-
-            // Get a Clip object to play the audio
-            Clip clip = AudioSystem.getClip();
-
-            // Open the audio stream
-            clip.open(audioStream);
-
-            // Start playing the audio
-            clip.start();
-        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException ex) {
-            ex.printStackTrace();
-        }
-    }
+     
 
     @Override
     public void run() {
       
         
             while (true) {
-                if (movingUp && canMoveUp()) {
+                if (movingUp) {
                     player.setFacingPosition("up");
                     player.modifyPlayerY(-MOVE_SPEED);
                 }
-                if (movingDown && canMoveDown()) {
+                if (movingDown) {
                     player.setFacingPosition("down");
                     player.modifyPlayerY(MOVE_SPEED);
                 }
-                if (movingLeft && canMoveLeft()) {
+                if (movingLeft) {
                     player.setFacingPosition("left");
                     player.modifyPlayerX(-MOVE_SPEED);
                 }
-                if (movingRight && canMoveRight()) {
+                if (movingRight) {
                     player.setFacingPosition("right");
                     player.modifyPlayerX(MOVE_SPEED);
                 }
@@ -136,29 +118,6 @@ public class PlayerKeys implements KeyListener, Runnable {
         }
     
 
-    private boolean canMoveUp() {
-        int x = player.getPlayerX() / 50;
-        int y = (player.getPlayerY() - MOVE_SPEED) / 50;
-        return y >= 0 && player.getPlayerY() >= MOVE_SPEED && player.canMove(x, y);
-    }
-
-    private boolean canMoveDown() {
-        int x = player.getPlayerX() / 50;
-        int y = (player.getPlayerY() + 52 + MOVE_SPEED) / 50;
-        return y < 12 && player.getPlayerY() <= 548 - MOVE_SPEED && player.canMove(x, y);
-    }
-
-    private boolean canMoveLeft() {
-        int x = (player.getPlayerX() - MOVE_SPEED) / 50;
-        int y = player.getPlayerY() / 50;
-        return x >= 0 && player.getPlayerX() >= MOVE_SPEED && player.canMove(x, y);
-    }
-
-    private boolean canMoveRight() {
-        int x = (player.getPlayerX() + 52 + MOVE_SPEED) / 50;
-        int y = player.getPlayerY() / 50;
-        return x < 13 && player.getPlayerX() <= 598 - MOVE_SPEED && player.canMove(x, y);
-    }
 
     public void processKeyPressed(int keyCode) {
         if (keyCode == KeyEvent.VK_SPACE) {
@@ -197,16 +156,16 @@ public class PlayerKeys implements KeyListener, Runnable {
     }
 
     private void updatePlayerMovement() {
-        if (movingUp && canMoveUp()) {
+        if (movingUp ) {
             player.setFacingPosition("up");
             player.modifyPlayerY(-MOVE_SPEED);
-        } else if (movingDown && canMoveDown()) {
+        } else if (movingDown ) {
             player.setFacingPosition("down");
             player.modifyPlayerY(MOVE_SPEED);
-        } else if (movingLeft && canMoveLeft()) {
+        } else if (movingLeft ) {
             player.setFacingPosition("left");
             player.modifyPlayerX(-MOVE_SPEED);
-        } else if (movingRight && canMoveRight()) {
+        } else if (movingRight ) {
             player.setFacingPosition("right");
             player.modifyPlayerX(MOVE_SPEED);
         }

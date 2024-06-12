@@ -241,7 +241,7 @@ public class Player implements Serializable {
 
 
     public String getFacingPosition() {
-        System.out.println("[right = "+this.right+"\n"+ "Left = "+this.left+"\n"+ "Up = "+this.up+"\n"+ "Down = "+this.down+"]");
+        // System.out.println("[right = "+this.right+"\n"+ "Left = "+this.left+"\n"+ "Up = "+this.up+"\n"+ "Down = "+this.down+"]");
         return facing; 
     
     }
@@ -259,6 +259,7 @@ public class Player implements Serializable {
         getFacingPosition();
         if(!playerShot)
 				{
+                    setPlayerShot(true);
 					if(getFacingPosition().equals("up"))
 					{					
 						pb = new PlayerBullet(playerX + 20, playerY);
@@ -276,7 +277,6 @@ public class Player implements Serializable {
 						pb = new PlayerBullet(playerX, playerY + 20);
 					}
 					
-					setPlayerShot(true);
 				}
                 pb.move(getBulletShootDir());
                 pb.draw(g);

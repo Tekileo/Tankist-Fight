@@ -179,51 +179,51 @@ public class PlayerKeysOnline implements KeyListener, Runnable {
     // ...
 
 
-    private boolean canMoveUp() {
-        int x = player.getPlayerX() / 50;
-        int y = (player.getPlayerY() - MOVE_SPEED) / 50;
-        return y >= 0 && player.getPlayerY() >= MOVE_SPEED && player.canMove(x, y);
-    }
+    // private boolean canMoveUp() {
+    //     int x = player.getPlayerX() / 50;
+    //     int y = (player.getPlayerY() - MOVE_SPEED) / 50;
+    //     return y >= 0 && player.getPlayerY() >= MOVE_SPEED && player.canMove(x, y);
+    // }
 
-    private boolean canMoveDown() {
-        int x = player.getPlayerX() / 50;
-        int y = (player.getPlayerY() + 52 + MOVE_SPEED) / 50;
-        return y < 12 && player.getPlayerY() <= 548 - MOVE_SPEED && player.canMove(x, y);
-    }
+    // private boolean canMoveDown() {
+    //     int x = player.getPlayerX() / 50;
+    //     int y = (player.getPlayerY() + 52 + MOVE_SPEED) / 50;
+    //     return y < 12 && player.getPlayerY() <= 548 - MOVE_SPEED && player.canMove(x, y);
+    // }
 
-    private boolean canMoveLeft() {
-        int x = (player.getPlayerX() - MOVE_SPEED) / 50;
-        int y = player.getPlayerY() / 50;
-        return x >= 0 && player.getPlayerX() >= MOVE_SPEED && player.canMove(x, y);
-    }
+    // private boolean canMoveLeft() {
+    //     int x = (player.getPlayerX() - MOVE_SPEED) / 50;
+    //     int y = player.getPlayerY() / 50;
+    //     return x >= 0 && player.getPlayerX() >= MOVE_SPEED && player.canMove(x, y);
+    // }
 
-    private boolean canMoveRight() {
-        int x = (player.getPlayerX() + 52 + MOVE_SPEED) / 50;
-        int y = player.getPlayerY() / 50;
-        return x < 13 && player.getPlayerX() <= 598 - MOVE_SPEED && player.canMove(x, y);
-    }
+    // private boolean canMoveRight() {
+    //     int x = (player.getPlayerX() + 52 + MOVE_SPEED) / 50;
+    //     int y = player.getPlayerY() / 50;
+    //     return x < 13 && player.getPlayerX() <= 598 - MOVE_SPEED && player.canMove(x, y);
+    // }
 
     @Override
     public void run() {
       
         
             while (true) {
-                if (movingUp && canMoveUp()) {
+                if (movingUp) {
                     player.setFacingPosition("up");
                     player.modifyPlayerY(-MOVE_SPEED);
                     sendPlayerKey("W");
                 }
-                if (movingDown && canMoveDown()) {
+                if (movingDown) {
                     player.setFacingPosition("down");
                     player.modifyPlayerY(MOVE_SPEED);
                     sendPlayerKey("S");
                 }
-                if (movingLeft && canMoveLeft()) {
+                if (movingLeft) {
                     player.setFacingPosition("left");
                     player.modifyPlayerX(-MOVE_SPEED);
                     sendPlayerKey("A");
                 }
-                if (movingRight && canMoveRight()) {
+                if (movingRight) {
                     player.setFacingPosition("right");
                     player.modifyPlayerX(MOVE_SPEED);
                     sendPlayerKey("D");
