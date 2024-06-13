@@ -1,6 +1,7 @@
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -23,11 +24,11 @@ public class ObjectsCollide {
     private void loadBrickIcons() {
         try {
               // Load assetsbg.png from the classpath
-        BufferedImage assetsbgImage = ImageIO.read(getClass().getResource("assetsbg.png"));
+        BufferedImage assetsbgImage = ImageIO.read(new File("resources/assetsbg.png"));
         // Load barricadeWood.png from the classpath
-        BufferedImage barricadeWoodImage = ImageIO.read(getClass().getResource("barricadeWood.png"));
+        BufferedImage barricadeWoodImage = ImageIO.read(new File("resources/barricadeWood.png"));
         // Load barricadeMetal.png from the classpath
-        BufferedImage barricadeMetalImage = ImageIO.read(getClass().getResource("barricadeMetal.png"));
+        BufferedImage barricadeMetalImage = ImageIO.read(new File("resources/barricadeMetal.png"));
             int iconIndex = 0;
             for (int y = 0; y < 200; y += 50) {
                 for (int x = 0; x < 500; x += 50) {

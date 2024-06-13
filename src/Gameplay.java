@@ -1,4 +1,6 @@
 import java.awt.event.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -59,19 +61,26 @@ public class Gameplay extends JPanel implements ActionListener {
 		this.name = name;
 		playBackgroundMusic("resources/BackgroundSound.wav",-10.5f);
 		if (online) {
+			DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        	DataInputStream in = new DataInputStream(con.getInputStream());
 			player1 = new Player(200, 550, "green", 5, null);
 			player2 = new Player(400, 550, "orange", 5, null);
 			players.add(player1);
 			players.add(player2);
+			  // Host sends its name to the client
+			  out.writeUTF(name);
+			  out.flush();
+			  // Host receives the client's name
+			  String otherName = in.readUTF();
 			if (isHost) {
 				player1.setName(name);
-				player2.setName("Player 2");
+				player2.setName(otherName);
 				pko = new PlayerKeysOnline(player1, con, "left");
 				phr = new HandlerResponse(player2, con, "Player2");
 				System.out.println("Im the green one");
 			} else {
 				player2.setName(name);
-				player1.setName("Player 1");
+				player1.setName(otherName);
 				pko = new PlayerKeysOnline(player2, con, "left");
 				phr = new HandlerResponse(player1, con, "Player1");
 				System.out.println("Im the orange one");
